@@ -1,0 +1,27 @@
+[tool.poetry]
+name = "documind"
+version = "0.1.0"
+description = ""
+authors = ["Eason_chiang <95297596+class83108@users.noreply.github.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+django = "4.2"
+psycopg2-binary = "^2.9.9"
+load-dotenv = "^0.1.0"
+django-channels = "^0.7.0"
+django-redis = "^5.4.0"
+django-celery-beat = "^2.7.0"
+celery = "^5.4.0"
+django-celery-results = "^2.5.1"
+flower = "^2.0.1"
+pdfminer-six = {extras = ["image"], version = "^20240706"}
+langchain = "^0.3.2"
+chromadb = "^0.5.11"
+openai = "^1.51.2"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
