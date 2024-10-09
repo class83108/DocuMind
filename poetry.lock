@@ -927,6 +927,20 @@ files = [
 Django = ">=3.2,<6.0"
 
 [[package]]
+name = "djangorestframework"
+version = "3.15.2"
+description = "Web APIs for Django, made easy."
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "djangorestframework-3.15.2-py3-none-any.whl", hash = "sha256:2b8871b062ba1aefc2de01f773875441a961fefbf79f5eed1e32b2f096944b20"},
+    {file = "djangorestframework-3.15.2.tar.gz", hash = "sha256:36fe88cd2d6c6bec23dca9804bab2ba5517a8bb9d8f47ebc68981b56840107ad"},
+]
+
+[package.dependencies]
+django = ">=4.2"
+
+[[package]]
 name = "durationpy"
 version = "0.9"
 description = "Module for converting between datetime.timedelta and Go's Duration strings."
@@ -4182,4 +4196,4 @@ type = ["pytest-mypy"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.12"
-content-hash = "a89ab0a5dbd93f00a30102c5a0bc7fcd5eac292b8d0e0c9d2496466ead0fa33a"
+content-hash = "d73bde4055a17f54ba63cf911420270916161de97d00d7bdcc734f1ecb5b6421"

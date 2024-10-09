@@ -20,6 +20,7 @@ pdfminer-six = {extras = ["image"], version = "^20240706"}
 langchain = "^0.3.2"
 chromadb = "^0.5.11"
 openai = "^1.51.2"
+djangorestframework = "^3.15.2"
 
 
 [build-system]
