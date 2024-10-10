@@ -35,6 +35,8 @@ REDIS_PORT = os.getenv("REDIS_PORT")
 REDIS_PASSWORD = os.getenv("REDIS_PASSWORD")
 
 
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
@@ -56,7 +58,11 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "rest_framework",
+    "django_celery_results",
+    "django_celery_beat",
     "articles",
+    "api",
 ]
 
 MIDDLEWARE = [
@@ -107,7 +113,7 @@ DATABASES = {
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": f"redis://:{REDIS_PASSWORD}@{REDIS_HOST}:{REDIS_PORT}/1",
+        "LOCATION": f"redis://:{REDIS_PASSWORD}@{REDIS_HOST}:{REDIS_PORT}/0",
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
         },
@@ -137,9 +143,9 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
 
-LANGUAGE_CODE = "en-us"
+LANGUAGE_CODE = "zh-hant"
 
-TIME_ZONE = "UTC"
+TIME_ZONE = "Asia/Taipei"
 
 USE_I18N = True
 
@@ -160,3 +166,34 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 MEDIA_ROOT = os.path.join(BASE_DIR, "uploads")
 MEDIA_URL = "/media/"
+
+
+# celery配置
+CELERY_BROKER_URL = f"redis://:{REDIS_PASSWORD}@{REDIS_HOST}:{REDIS_PORT}/0"
+CELERY_TIMEZONE = "Asia/Taipei"
+
+
+# celery結果存儲
+CELERY_RESULT_BACKEND = "django-db"
+# celery消息格式配置
+CELERY_ACCEPT_CONTENT = ["json"]
+CELERY_TASK_SERIALIZER = "json"
+CELERY_RESULT_SERIALIZER = "json"
+
+# celery 超時時間
+CELERYD_TASK_TIME_LIMIT = 60 * 10
+
+# celery 儲存結果的過期時間 默認1天過期 如設為0則永不過期
+CELERY_TASK_RESULT_EXPIRES = 60 * 60 * 24
+
+# celery 任務限流
+CELERY_TASK_ANNOTATIONS = {"tasks.add": {"rate_limit": "10/s"}}
+
+
+# 每個worker執行多少任務後會被殺死，預防內存泄漏
+CELERYD_MAX_TASKS_PER_CHILD = 100
+
+# 消除警告
+CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
+
+CELERY_BEAT_SCHEDULER = "django_celery_beat.schedulers:DatabaseScheduler"

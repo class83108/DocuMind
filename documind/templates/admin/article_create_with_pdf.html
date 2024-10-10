@@ -1,0 +1,38 @@
+{% extends "admin/base_site.html" %}
+{% load static %}
+
+{% block extrahead %}
+    {{ block.super }}
+    <link rel="stylesheet" href="/static/css/article_form.css">
+	<script src="https://unpkg.com/htmx.org@2.0.3"></script>
+{% endblock %}
+
+{% block content %}
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="container">
+            <div class="row">
+                <div class="form-label"><label for="title">Title:</label></div>
+                <div class="form-content"><input type="text" id="title" name="title" required></div>
+            </div>
+            <div class="row">
+                <div class="form-label">
+                    <label for="pdf_file">Upload PDF:</label>
+                </div>
+                <div class="form-content"><input type="file" id="pdf_file" name="pdf_file" accept="application/pdf"
+                    hx-post="{% url 'api:upload-pdf' %}"
+                    hx-trigger="change"
+                    hx-target="#article_content"
+                    hx-swap="innerHTML"
+                    hx-encoding="multipart/form-data"></div>
+            </div>
+            <div class="row">
+                <div class="form-label"><label for="article_content">Content:</label></div>
+                <div class="form-content"><textarea id="article_content" name="content" rows="10" cols="50"></textarea></div>
+            </div>
+        </div>
+        <button class="submit_btn" type="submit">Create Article</button>
+    </form>
+    <div id="result"></div>
+    
+{% endblock %}
