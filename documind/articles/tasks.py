@@ -92,11 +92,10 @@ def search_documents_and_answer(query: str, num_results: int = 5) -> dict:
         template="根據以下信息回答問題：\n\n{context}\n\n問題: {query}\n\n答案:",
     )
 
-    # 創建 LLMChain
+    # 建立鏈 - 輸入提示，語言模型，輸出解析器
     chain = prompt | llm | StrOutputParser()
 
-    # 生成答案
-    # answer = chain.run(context=context, query=query)
+    # 調用鏈 - 將上下文和查詢作為輸入取代得答案
     answer = chain.invoke({"context": context, "query": query})
 
     return {
