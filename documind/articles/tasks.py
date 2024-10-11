@@ -1,15 +1,13 @@
+from celery import shared_task
 from django.conf import settings
-from documind.vectorstore import get_vectorstore
 from langchain.chains import LLMChain
-from langchain_community.llms import OpenAI
 from langchain.prompts import PromptTemplate
 from langchain.schema import Document
 from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain_community.llms import OpenAI
+
 
 from documind.vectorstore import get_vectorstore
-
-
-from celery import shared_task
 from .models import Article
 
 import uuid
