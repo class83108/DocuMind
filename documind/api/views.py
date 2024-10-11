@@ -1,7 +1,7 @@
 from django.shortcuts import render
-from rest_framework import serializers, views, response, status
+from rest_framework import views, response, status
 from django.http import HttpResponse
-from pdfminer.high_level import extract_pages, extract_text
+from pdfminer.high_level import extract_text
 import io
 import re
 
