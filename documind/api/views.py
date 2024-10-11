@@ -1,7 +1,6 @@
-from django.shortcuts import render
-from rest_framework import serializers, views, response, status
 from django.http import HttpResponse
-from pdfminer.high_level import extract_pages, extract_text
+from pdfminer.high_level import extract_text
+from rest_framework import views, response, status
 import io
 import re
 
@@ -33,7 +32,7 @@ class PDFUploadView(views.APIView):
         # 删除特殊字符
         text = re.sub(r"[^\w\s\.\,\?\!]", "", text)
 
-        # 将连续的换行符替换为单个换行符
+        # 將連續的換行符替換為單個換行符
         text = re.sub(r"\n+", "\n", text)
 
         # 删除行首和行尾的空白字符
