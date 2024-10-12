@@ -7,6 +7,8 @@ DocuMind is a project where users can upload PDFs to the server, input keywords,
 - Upload PDF documents to the server.
 - Search for keywords within the uploaded documents.
 - Retrieve and display parts of the articles related to the input keywords.
+- Utilize LangChain for advanced language processing.
+- Process and manage communication channels effectively.
 
 ## Technologies Used
 
@@ -16,3 +18,5 @@ DocuMind is a project where users can upload PDFs to the server, input keywords,
 - PostgreSQL: Used for persistent data storage in the project
 - Redis: Besides serving as Django's cache storage, it's mainly used to store Celery queue information
 - ChromaDB: Lightweight vector database
+- LangChain: Advanced language processing
+- Channels: Efficient communication management
