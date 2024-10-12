@@ -52,6 +52,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    "daphne",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -61,8 +62,10 @@ INSTALLED_APPS = [
     "rest_framework",
     "django_celery_results",
     "django_celery_beat",
+    "channels",
     "articles",
     "api",
+    "chat",
 ]
 
 MIDDLEWARE = [
@@ -93,7 +96,8 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = "documind.wsgi.application"
+ASGI_APPLICATION = "documind.asgi.application"
+# WSGI_APPLICATION = "documind.wsgi.application"
 
 
 # Database
@@ -120,6 +124,14 @@ CACHES = {
     }
 }
 
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [f"redis://:{REDIS_PASSWORD}@{REDIS_HOST}:{REDIS_PORT}/0"],
+        },
+    },
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators

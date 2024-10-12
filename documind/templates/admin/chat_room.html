@@ -1,0 +1,119 @@
+{% extends "admin/base_site.html" %}
+{% load static %}
+{% block extrahead %}
+    <link rel="stylesheet" href="/static/css/chat.css">
+    <script src="https://unpkg.com/alpinejs@3.13.5/dist/cdn.min.js" defer></script>
+    {% endblock %}
+
+    {% block content %}
+    <div id="chat-container" x-data="chatApp()" class="chat-container">
+        <div class="chat-group">
+            <div id="chat-messages" class="chat-messages">
+                <template x-for="message in messages" :key="message.id">
+                    <div :class="['message', message.type + '-message']">
+                        <span x-text="message.text"></span>
+                    </div>
+                </template>
+            </div>
+            <div id="chat-input" class="chat-input">
+                <textarea 
+                x-model="newMessage" 
+                @compositionstart="isComposing = true"
+                @compositionend="isComposing = false"
+                @keydown="handleKeydown"
+                @input="adjustTextareaHeight"
+                placeholder="輸入訊息..." 
+                class="query-input"
+                rows="1"
+                x-ref="messageInput"></textarea>
+                <button  class="send-btn" @click="sendMessage">Send</button>
+            </div>
+        </div>
+    </div>
+    <script>
+        function chatApp() {
+            return {
+                messages: [],
+                newMessage: '',
+                socket: null,
+                isComposing: false,
+                init() {
+                    this.connectWebSocket();
+                    console.log("Chat app initialized");
+                    this.$nextTick(() => {
+                        this.adjustTextareaHeight();
+                    });
+                },
+                connectWebSocket() {
+                    const roomName = 'chat_{{ room_name }}';
+                    this.socket = new WebSocket(
+                        'ws://' + window.location.host + '/ws/chat/' + roomName + '/'
+                    );
+            
+                    this.socket.onmessage = (event) => {
+                        const data = JSON.parse(event.data);
+                        console.log("Received data:", data);
+                        if (data.type === 'loading') {
+                            this.addMessage(data.message, 'system');
+                        } else if (data.type === 'message') {
+                            setTimeout(() => {
+                                if (this.messages.length > 0 && this.messages[this.messages.length - 1].type === 'system') {
+                                    this.messages.pop();
+                                }
+                                this.addMessage(data.message, 'bot');
+                            }, 1000);
+                        }
+                    };
+            
+                    this.socket.onclose = (event) => {
+                        console.error('Chat socket closed unexpectedly');
+                    };
+                },
+                sendMessage() {
+                    if (this.newMessage.trim() === '') return;
+                    console.log("Sending message:", this.newMessage);
+                    this.addMessage(this.newMessage, 'user');
+                    this.socket.send(JSON.stringify({
+                        'message': this.newMessage
+                    }));
+                    this.newMessage = '';
+                    this.$nextTick(() => {
+                        this.adjustTextareaHeight();
+                    });
+                },
+                addMessage(text, type) {
+                    console.log("Adding message:", text, type);
+                    const message = {
+                        id: Date.now(),
+                        text: text,
+                        type: type
+                    };
+                    this.messages.push(message);
+                    console.log("Updated messages:", JSON.parse(JSON.stringify(this.messages)));
+                    this.$nextTick(() => {
+                        const chatMessages = document.getElementById('chat-messages');
+                        chatMessages.scrollTop = chatMessages.scrollHeight;
+                    });
+                },
+                handleKeydown(event) {
+                    if (event.key === 'Enter') {
+                        if (event.shiftKey) {
+                            // Shift+Enter: add newline
+                            return;
+                        } else if (!this.isComposing) {
+                            // Enter without shift and not composing: send message
+                            event.preventDefault();
+                            this.sendMessage();
+                        }
+                    }
+                },
+                adjustTextareaHeight() {
+                    const textarea = this.$refs.messageInput;
+                    textarea.style.height = 'auto';
+                    textarea.style.height = textarea.scrollHeight + 'px';
+                }
+            }
+        }
+    </script>
+  
+    {% endblock %}

@@ -8,6 +8,19 @@
                 {% translate "Create with PDF" %}
             </a>
         </li>
-    {% endif %}
+        {{ block.super }}
+
+    
+    {% elif show_create_chat_room %}
+    <li>
+        <a href="{% url 'admin:create_chat_room' %}" class="addlink">
+            {% translate "Create new chat" %}
+        </a>
+    </li>
+    {% else %}
     {{ block.super }}
+    {% endif %}
+
+    
+    
 {% endblock %}
