@@ -1,11 +1,7 @@
-from django.contrib import admin
-
 # articles/admin.py
 from django.contrib import admin
-from django.forms import ModelForm
-from django.http import HttpRequest
 from django.urls import path
-from django.shortcuts import render, redirect
+from django.shortcuts import render
 
 from .models import Chat
 
@@ -29,6 +25,7 @@ class ChatAdmin(admin.ModelAdmin):
     def create_room_view(self, request):
         context = dict(
             self.admin_site.each_context(request),
+            room_name=request.user.username,
             title="New Chat Room",
         )
         if request.method == "GET":

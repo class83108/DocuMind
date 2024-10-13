@@ -1,9 +1,11 @@
-import json
-from channels.generic.websocket import WebsocketConsumer
 from asgiref.sync import async_to_sync
-from articles.tasks import search_documents_and_answer
 from celery.result import AsyncResult
+from channels.generic.websocket import WebsocketConsumer
+
+from articles.tasks import search_documents_and_answer
+
 import time
+import json
 
 
 class ChatConsumer(WebsocketConsumer):

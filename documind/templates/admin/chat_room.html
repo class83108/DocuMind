@@ -45,7 +45,7 @@
                     });
                 },
                 connectWebSocket() {
-                    const roomName = 'chat_{{ room_name }}';
+                    const roomName = '{{ room_name }}_chat';
                     this.socket = new WebSocket(
                         'ws://' + window.location.host + '/ws/chat/' + roomName + '/'
                     );
