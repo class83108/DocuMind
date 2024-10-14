@@ -9,6 +9,19 @@ class Chat(models.Model):
     history = models.JSONField(default=list)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    is_permanent = models.BooleanField(default=False)
 
     def __str__(self):
         return self.room_name
+
+
+class PDFDocument(models.Model):
+    chatroom = models.ForeignKey(
+        Chat, on_delete=models.CASCADE, related_name="pdf_documents"
+    )
+    file = models.FileField(upload_to="pdf_documents/")
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+    processed = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"PDF for {self.chatroom.name}"

@@ -30,9 +30,14 @@ class ChatAdmin(admin.ModelAdmin):
         context = dict(
             self.admin_site.each_context(request),
             title="New Chat Room",
+            room_name=request.user.username,
         )
         if request.method == "GET":
             return render(request, "admin/chat_room.html", context)
+
+        if request.method == "POST":
+
+            pass
 
     def changelist_view(self, request, extra_context=None):
         extra_context = extra_context or {}

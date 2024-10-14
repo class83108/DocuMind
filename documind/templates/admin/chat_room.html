@@ -9,7 +9,7 @@
     <div id="chat-container" x-data="chatApp()" class="chat-container">
         <div class="chat-group">
             <div id="chat-messages" class="chat-messages">
-                <template x-for="message in messages" :key="message.id">
+                <template x-for="message in messages">
                     <div :class="['message', message.type + '-message']">
                         <span x-text="message.text"></span>
                     </div>
@@ -38,8 +38,8 @@
                 socket: null,
                 isComposing: false,
                 init() {
+                    this.messages = [];
                     this.connectWebSocket();
-                    console.log("Chat app initialized");
                     this.$nextTick(() => {
                         this.adjustTextareaHeight();
                     });
@@ -52,16 +52,14 @@
             
                     this.socket.onmessage = (event) => {
                         const data = JSON.parse(event.data);
-                        console.log("Received data:", data);
                         if (data.type === 'loading') {
+                            console.log("Received loading message");
                             this.addMessage(data.message, 'system');
                         } else if (data.type === 'message') {
-                            setTimeout(() => {
-                                if (this.messages.length > 0 && this.messages[this.messages.length - 1].type === 'system') {
-                                    this.messages.pop();
-                                }
-                                this.addMessage(data.message, 'bot');
-                            }, 1000);
+                            console.log("Received message");
+                            this.handleIncomingMessage(data);
+                        } else if (data.type === 'history') {
+                            this.handleHistoryMessages(data.messages);
                         }
                     };
             
@@ -69,9 +67,30 @@
                         console.error('Chat socket closed unexpectedly');
                     };
                 },
+                handleIncomingMessage(data) {
+                    
+                    if (this.messages.length > 0 && this.messages[this.messages.length - 1].type === 'system') {
+                        
+                        this.messages = this.messages.slice(0, -1);
+                    }
+                    if (data.sender === "DocuMind") {
+                        this.addMessage(data.message, 'bot');
+                    } else if (data.sender && data.sender !== "DocuMind") {
+                        this.addMessage(data.message, 'user');
+                    } else {
+                        this.addMessage(data.message, 'bot');
+                    }
+                },
+                handleHistoryMessages(messages) {
+                    this.messages = messages.map(msg => ({
+                        id: `msg_${this.messages.length}_${Date.now()}`,
+                        text: msg.message,
+                        type: msg.sender === 'DocuMind' ? 'bot' : 'user'
+                    }));
+                    
+                },
                 sendMessage() {
                     if (this.newMessage.trim() === '') return;
-                    console.log("Sending message:", this.newMessage);
                     this.addMessage(this.newMessage, 'user');
                     this.socket.send(JSON.stringify({
                         'message': this.newMessage
@@ -82,14 +101,12 @@
                     });
                 },
                 addMessage(text, type) {
-                    console.log("Adding message:", text, type);
                     const message = {
-                        id: Date.now(),
+                        id: `msg_${this.messages.length}_${Date.now()}`,
                         text: text,
                         type: type
                     };
                     this.messages.push(message);
-                    console.log("Updated messages:", JSON.parse(JSON.stringify(this.messages)));
                     this.$nextTick(() => {
                         const chatMessages = document.getElementById('chat-messages');
                         chatMessages.scrollTop = chatMessages.scrollHeight;
