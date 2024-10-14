@@ -4,7 +4,9 @@ from channels.db import database_sync_to_async
 from channels.generic.websocket import AsyncWebsocketConsumer
 from django.core.cache import cache
 
-from articles.tasks import search_documents_and_answer
+
+# from articles.tasks import search_documents_and_answer
+from .tasks import search_documents_and_answer
 from .tasks import save_chat_history
 from .models import Chat
 
@@ -54,7 +56,9 @@ class ChatConsumer(AsyncWebsocketConsumer):
         )
 
         # Start async task
-        task = await sync_to_async(search_documents_and_answer.delay)(message)
+        task = await sync_to_async(search_documents_and_answer.delay)(
+            query=message, chat_id=self.chat.id
+        )
 
         # Start checking task result
         await self.check_task_result(task.id)
@@ -138,10 +142,10 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
     @database_sync_to_async
     def add_to_chat_history(self, sender, message):
-        history_key = f"chat_history_{self.room_name}"
+        history_key = f"chat_history_{self.chat.id}"
         history = cache.get(history_key) or []
         history.append({"sender": sender, "message": message})
         cache.set(history_key, history, timeout=None)
 
     async def save_chat_history_async(self):
-        save_chat_history.delay(self.chat.id, self.room_name)
+        save_chat_history.delay(self.chat.id)

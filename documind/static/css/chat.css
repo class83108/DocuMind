@@ -2,7 +2,11 @@
   display: flex;
 }
 .chat-container .chat-group {
-  width: 100%;
+  width: 80%;
+}
+.chat-container .file-group {
+  padding: 1rem;
+  width: 20%;
 }
 
 .chat-messages {
@@ -50,4 +54,18 @@
 
 .bot-message {
   background-color: #e8e8e8;
+}
+
+.title-group {
+  display: flex;
+  justify-content: space-between;
+}
+
+.file-list {
+  padding: 0;
+}
+.file-list .pdf-file-item {
+  list-style: none;
+  padding: 0.5rem;
+  font-size: 1.1rem;
 }/*# sourceMappingURL=chat.css.map */

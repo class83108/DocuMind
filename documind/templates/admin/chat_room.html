@@ -3,8 +3,15 @@
 {% block extrahead %}
     <link rel="stylesheet" href="/static/css/chat.css">
     <script src="https://unpkg.com/alpinejs@3.13.5/dist/cdn.min.js" defer></script>
+    <script src="https://unpkg.com/htmx.org@2.0.3"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     {% endblock %}
-
+    {% block pretitle %}
+    <div class=title-group>
+        <h1>Chat Room</h1>
+        <h2>{{ room_name }}</h2>
+    </div>
+    {% endblock %}
     {% block content %}
     <div id="chat-container" x-data="chatApp()" class="chat-container">
         <div class="chat-group">
@@ -29,6 +36,24 @@
                 <button  class="send-btn" @click="sendMessage">Send</button>
             </div>
         </div>
+        <div class="file-group">
+            <form id="upload-form">
+                {% csrf_token %}
+                <div class="input-container">
+                    <input type="file" id="pdf_file" name="pdf_file" accept="application/pdf"
+                        hx-post="{% url 'api:upload-pdf-and-save' %}"
+                        hx-trigger="change"
+                        hx-swap="beforeend"
+                        hx-encoding="multipart/form-data"
+                        hx-vals='{"chat_room_name": "{{ room_name }}"}'
+                        >
+                        
+                </div>
+            </form>
+            <div id="file-container">
+                <ul id="file-list" class="file-list"></ul>
+            </div>
+        </div>
     </div>
     <script>
         function chatApp() {
@@ -45,7 +70,7 @@
                     });
                 },
                 connectWebSocket() {
-                    const roomName = 'chat_{{ room_name }}';
+                    const roomName = '{{ room_name }}';
                     this.socket = new WebSocket(
                         'ws://' + window.location.host + '/ws/chat/' + roomName + '/'
                     );
@@ -70,7 +95,6 @@
                 handleIncomingMessage(data) {
                     
                     if (this.messages.length > 0 && this.messages[this.messages.length - 1].type === 'system') {
-                        
                         this.messages = this.messages.slice(0, -1);
                     }
                     if (data.sender === "DocuMind") {
@@ -132,5 +156,25 @@
             }
         }
     </script>
+
+    <script>
+        document.body.addEventListener('htmx:afterRequest', function(event) {
+            if (event.detail.successful) {
+                var response = JSON.parse(event.detail.xhr.responseText);
+                if (response.success) {
+                    var fileItem = document.createElement('li');
+                    fileItem.className = 'pdf-file-item';
+                    fileItem.innerHTML = `
+                        <span class="pdf-icon"><i class="fa-solid fa-file-pdf"></i></span>
+                        <span class="file-name">${response.file_name}</span>
+                    `;
+                    document.getElementById('file-list').appendChild(fileItem);
+                    
+                    // 清除文件輸入
+                    document.getElementById('pdf_file').value = '';
+                }
+            }
+        });
+        </script>
   
     {% endblock %}

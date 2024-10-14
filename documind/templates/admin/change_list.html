@@ -20,7 +20,23 @@
     {% else %}
     {{ block.super }}
     {% endif %}
-
+   
     
     
 {% endblock %}
+
+{% block result_list %}
+{{ block.super }}
+{% if chat_rooms %}
+{% for chat_room in chat_rooms %}
+<li>
+    <a href="{% url 'admin:chat_room' chat_room.room_name %}" class="addlink">
+        {{ chat_room.room_name }}
+    </a>
+</li>
+{% endfor %}
+{% else %}
+{{ block.super }}
+{% endif %}
+      
+    {% endblock %}

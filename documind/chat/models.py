@@ -19,9 +19,9 @@ class PDFDocument(models.Model):
     chatroom = models.ForeignKey(
         Chat, on_delete=models.CASCADE, related_name="pdf_documents"
     )
-    file = models.FileField(upload_to="pdf_documents/")
     uploaded_at = models.DateTimeField(auto_now_add=True)
     processed = models.BooleanField(default=False)
+    text = models.TextField(default="")
 
     def __str__(self):
         return f"PDF for {self.chatroom.name}"
